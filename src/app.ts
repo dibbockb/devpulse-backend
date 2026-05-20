@@ -4,6 +4,8 @@ const app: Application = express();
 
 app.get('/', (req: Request, res: Response) => {
     res.status(200).json({
-        "message": "Express Server Running...",
+        "message": "Server Running...",
     })
 })
+
+export default app;
