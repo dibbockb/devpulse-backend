@@ -9,16 +9,16 @@ const createUser = async (req: Request, res: Response) => {
         sendResponse(res, {
             statusCode: 201,
             success: true,
-            message: "🟢 User Created",
+            message: "User registered successfully",
             data: result.rows[0]
         })
 
-    } catch (error: any) {
+    } catch (error) {
         sendResponse(res, {
             statusCode: 500,
             success: false,
-            message: error.message,
-            error: error
+            message: (error as Error).message,
+            errors: error as string
         })
     }
 }

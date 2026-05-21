@@ -17,8 +17,7 @@ const createIssue = async (req: Request, res: Response) => {
         sendResponse(res, {
             success: false,
             statusCode: 500,
-            // message: error.message
-            message: `Unable to create issue`,
+            message: (error as Error).message
         })
     }
 }
@@ -49,7 +48,8 @@ const getSingleIssue = async (req: Request, res: Response) => {
         sendResponse(res, {
             success: false,
             statusCode: 404,
-            message: `Issue not Found.`
+            message: (error as Error).message
+
         })
     }
 }
@@ -70,7 +70,7 @@ const updateIssue = async (req: Request, res: Response,) => {
             statusCode: 500,
             success: false,
             message: "Unable to Update Issue",
-            error: (error as Error).message
+            errors: (error as Error).message
         })
     }
 }
@@ -97,7 +97,7 @@ const deleteIssue = async (req: Request, res: Response) => {
             statusCode: 500,
             success: false,
             message: "Unable to Delete Issue",
-            error: (error as Error).message
+            errors: (error as Error).message
         })
     }
 }
