@@ -1,7 +1,7 @@
 import { pool } from "../../db/database";
 import type { IssuesInterface } from "./issues.type";
 
-const createIssue = async (payload: IssuesInterface) => {
+const createIssueIntoDB = async (payload: IssuesInterface) => {
     const { title, description, type } = payload;
 
     const result = await pool.query(`
@@ -15,6 +15,13 @@ const createIssue = async (payload: IssuesInterface) => {
     return createdIssueData;
 }
 
+const getIssuesFromDB = async () => {
+    const result = await pool.query(`
+    SELECT * FROM issues
+    `)
+    return result;
+}
+
 export const issueService = {
-    createIssue,
+    createIssueIntoDB, getIssuesFromDB
 }

@@ -4,7 +4,7 @@ import { issueService } from "./issues.service";
 
 const createIssue = async (req: Request, res: Response) => {
     try {
-        const createdIssueData = await issueService.createIssue(req.body)
+        const createdIssueData = await issueService.createIssueIntoDB(req.body)
 
         sendResponse(res, {
             success: true,
@@ -23,6 +23,17 @@ const createIssue = async (req: Request, res: Response) => {
     }
 }
 
+const getIssues = async (req: Request, res: Response) => {
+    const issuesList = await issueService.getIssuesFromDB();
+    sendResponse(res, {
+        success: true,
+        statusCode: 200,
+        message: "Retrieved All Issues.",
+        data: issuesList.rows,
+    })
+
+}
+
 export const issuesController = {
-    createIssue,
+    createIssue, getIssues
 }
