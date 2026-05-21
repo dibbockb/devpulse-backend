@@ -5,7 +5,7 @@ type ResponseType<T> = {
     message: string,
     success: boolean,
     data?: T,
-    error?: any,
+    error?: string,
 }
 
 const sendResponse = <T>(res: Response, data: ResponseType<T>) => {
