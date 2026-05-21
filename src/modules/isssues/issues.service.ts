@@ -16,12 +16,21 @@ const createIssueIntoDB = async (payload: IssuesInterface) => {
 }
 
 const getIssuesFromDB = async () => {
-    const result = await pool.query(`
+    const issuesList = await pool.query(`
     SELECT * FROM issues
     `)
-    return result;
+    return issuesList;
 }
 
+const getSingleIssueFromDB = async (id: string) => {
+    const requestedIssue = await pool.query(`
+    SELECT * FROM issues 
+    WHERE id=$1
+    `, [id])
+    return requestedIssue;
+}
+
+
 export const issueService = {
-    createIssueIntoDB, getIssuesFromDB
+    createIssueIntoDB, getIssuesFromDB, getSingleIssueFromDB
 }
