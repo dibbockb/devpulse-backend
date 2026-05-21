@@ -1,6 +1,7 @@
 import express, { type Application, type Request, type Response } from "express";
 import cors from "cors"
 import globalErrorHandler from "./utility/globalErrorHandler";
+import { userRoute } from "./modules/user/user.route";
 
 const app: Application = express();
 
@@ -15,5 +16,8 @@ app.get('/', (req: Request, res: Response) => {
     })
 })
 
+app.use(`/api/auth/signup`, userRoute)
+
 app.use(globalErrorHandler);
+
 export default app;
