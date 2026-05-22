@@ -47,7 +47,7 @@ const checkRole = (...roles: string[]) => {
             if (user.role && roles.includes(user.role)) {
                 return next();
             }
-            return sendResponse(res, { statusCode: 401, success: false, message: `You do not have permission` })
+            return sendResponse(res, { statusCode: 403, success: false, message: `You do not have permission` })
         } catch (error) {
             return next(error);
         }

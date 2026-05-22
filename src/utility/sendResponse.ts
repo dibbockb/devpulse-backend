@@ -9,12 +9,14 @@ type ResponseType<T> = {
 }
 
 const sendResponse = <T>(res: Response, data: ResponseType<T>) => {
-    res.status(data.statusCode).json({
+    const responseJson: Record<string, unknown> = {
         success: data.success,
         message: data.message,
-        data: data.data,
-        error: data.error
-    })
+    }
+    if (data.data !== undefined) responseJson.data = data.data;
+    if (data.error !== undefined) responseJson.error = data.error;
+
+    res.status(data.statusCode).json(responseJson)
 }
 
 export default sendResponse;

@@ -23,6 +23,10 @@ app.use(`/api/auth/signup`, userRoute)
 app.use(`/api/auth`, authRoute)
 app.use(`/api/issues`, issuesRoute)
 
+app.use((req: Request, res: Response) => {
+    res.status(404).json({ success: false, message: "Route not found" })
+})
+
 app.use(globalErrorHandler);
 
 export default app;
