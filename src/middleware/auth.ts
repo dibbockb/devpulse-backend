@@ -55,4 +55,48 @@ const checkRole = (...roles: string[]) => {
     }
 }
 
-export const auth = { verifyToken, checkRole };
+const checkUpdatePermission = () => {
+    return async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const userId = req.user?.id;
+            const userRole = req.user?.role;
+            const { id: issueId } = req.params;
+
+            const issueResult = await pool.query(`
+                SELECT reporter_id, status FROM issues WHERE id=$1
+                `, [issueId])
+
+            const issue = issueResult.rows[0];
+
+            if (!issue) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Issue not found"
+                });
+            }
+
+            if (userRole === 'maintainer') {
+                return next();
+            }
+
+            if (userRole === 'contributor') {
+                const isOwner = Number(userId) === Number(issue.reporter_id);
+                const isOpen = issue.status === 'open';
+
+                if (isOwner && isOpen) {
+                    return next();
+                }
+            }
+
+            return res.status(403).json({
+                success: false,
+                message: "You do not have permission."
+            });
+
+        } catch (error) {
+            return next(error)
+        }
+    }
+}
+
+export const auth = { verifyToken, checkRole, checkUpdatePermission };

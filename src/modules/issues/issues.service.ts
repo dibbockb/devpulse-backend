@@ -42,7 +42,6 @@ const updateIssueInDB = async (payload: IssuesInterface, id: string) => {
     const { title, description, type } = payload;
     const result = await pool.query(`
         UPDATE issues
-
         SET
             title=COALESCE($1, title),
             description=COALESCE($2, description),
