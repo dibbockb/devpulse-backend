@@ -6,43 +6,23 @@ import { pool } from "../db/database";
 
 const checkToken = () => {
     return async (req: Request, res: Response, next: NextFunction) => {
-        const token = req.headers.authorization;
-        if (!token) {
-            return sendResponse(res, {
-                success: false,
-                statusCode: 403,
-                message: `Unauthorized!`
-            })
+        try {
+            const token = req.headers.authorization;
+            if (!token) {
+                return sendResponse(res, {
+                    success: false,
+                    statusCode: 403,
+                    message: `Unauthorized!`
+                })
+            }
+            return next();
+        } catch (error) {
+            return next(error)
         }
-        next()
     }
 }
 
 const verifyUser = () => {
-    return async (req: Request, res: Response, next: NextFunction) => {
-
-        const token = req.headers.authorization as string;
-        const decodedToken = jwt.verify(token, envConfig.jwt_secret as string,) as JwtPayload;
-
-        const userData = await pool.query(`
-            SELECT * FROM users WHERE email=$1
-            `, [decodedToken.email])
-
-        const user = userData.rows[0]
-        delete user.password;
-
-        if (userData.rows.length === 0) {
-            return sendResponse(res, {
-                success: false,
-                statusCode: 403,
-                message: `Forbidden!`
-            })
-        }
-        next();
-    }
-}
-
-const checkRole = (...roles: string[]) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
             const token = req.headers.authorization as string;
@@ -53,22 +33,48 @@ const checkRole = (...roles: string[]) => {
             `, [decodedToken.email])
 
             const user = userData.rows[0]
+            if (!user) {
+                return sendResponse(res, { statusCode: 404, success: false, message: "User not found" });
+            }
+            delete user.password;
+
+            if (userData.rows.length === 0) {
+                return sendResponse(res, {
+                    success: false,
+                    statusCode: 403,
+                    message: `Forbidden!`
+                })
+            }
+            return next();
+        } catch (error) {
+            return next(error)
+        }
+    }
+}
+
+const checkRole = (...roles: string[]) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const token = req.headers.authorization as string;
+            const decodedToken = jwt.verify(token, envConfig.jwt_secret as string,) as JwtPayload;
+            const userData = await pool.query(`
+
+            SELECT * FROM users WHERE email=$1
+            `, [decodedToken.email])
+            const user = userData.rows[0]
 
             if (!user) {
                 return sendResponse(res, { statusCode: 404, success: false, message: "User not found" });
             }
-
             delete user.password;
 
             if (decodedToken.role !== user.role) {
                 return sendResponse(res, { statusCode: 403, success: false, message: "Token dont match" });
             }
-
             if (user.role && roles.includes(user.role)) {
                 console.log(`Permission granted`);
                 return next();
             }
-
             return sendResponse(res, { statusCode: 401, success: false, message: `You do not have permission` })
         } catch (error) {
             return next(error);
