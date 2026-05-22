@@ -29,75 +29,37 @@ const createIssue = async (req: Request, res: Response) => {
 
 const getIssues = async (req: Request, res: Response) => {
     try {
-        const result = await issueService.getIssuesFromDB();
-
-        const formattedIssues = result.rows.map((issue: any) => ({
-            id: issue.id,
-            title: issue.title,
-            description: issue.description,
-            type: issue.type,
-            status: issue.status,
-            reporter: {
-                id: issue.user_id,
-                name: issue.user_name,
-                role: issue.user_role
-            },
-            created_at: issue.created_at,
-            updated_at: issue.updated_at
-        }));
-
+        const issues = await issueService.getIssuesFromDB();
         res.status(200).json({
             success: true,
-            data: formattedIssues
+            data: issues
         });
+
     } catch (error) {
         sendResponse(res, {
-            success: false,
             statusCode: 500,
-            message: "Unable to retrieve issues.",
+            success: false,
+            message: "Unable to retrieve issues."
         })
     }
-
 }
 
 const getSingleIssue = async (req: Request, res: Response) => {
     try {
-        const result = await issueService.getSingleIssueFromDB(req.params.id as string);
-        if (!result.rowCount) {
+        const issue = await issueService.getSingleIssueFromDB(req.params.id as string)
+
+        if (!issue) {
             return sendResponse(res, {
                 statusCode: 404,
                 success: false,
                 message: "Issue not found",
             });
         }
-        const issue = result.rows[0];
-        const formattedSingleIssue = {
-            id: issue.id,
-            title: issue.title,
-            description: issue.description,
-            type: issue.type,
-            status: issue.status,
-            reporter: {
-                id: issue.user_id,
-                name: issue.user_name,
-                role: issue.user_role
-            },
-            created_at: issue.created_at,
-            updated_at: issue.updated_at
-        };
 
-        res.status(200).json({
-            success: true,
-            data: formattedSingleIssue
-        });
+        res.status(200).json({ success: true, data: issue });
 
     } catch (error) {
-        sendResponse(res, {
-            success: false,
-            statusCode: 404,
-            message: (error as Error).message
-
-        })
+        sendResponse(res, { statusCode: 500, success: false, message: (error as Error).message })
     }
 }
 

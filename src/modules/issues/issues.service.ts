@@ -16,26 +16,65 @@ const createIssueIntoDB = async (payload: IssuesInterface) => {
 }
 
 const getIssuesFromDB = async () => {
-    const issuesList = await pool.query(`
-        SELECT 
-            i.id, i.title, i.description, i.type, i.status, i.created_at, i.updated_at,
-            u.id AS user_id, u.name AS user_name, u.role AS user_role
-        FROM issues i
-        LEFT JOIN users u ON i.reporter_id = u.id
+    const issuesResult = await pool.query(`
+    SELECT * FROM issues ORDER BY created_at DESC
     `)
-    return issuesList;
+
+    const issues = issuesResult.rows;
+    if (issues.length === 0) { return [] };
+
+    const reporterIds = [...new Set(issues.map((i: any) => i.reporter_id))];
+
+    const usersResult = await pool.query(`
+        SELECT id, name, role FROM users WHERE id = ANY($1::int[])
+    `, [reporterIds])
+
+    const userMap: Record<number, any> = {};
+    usersResult.rows.forEach((u: any) => {
+        userMap[u.id] = u;
+    });
+
+    const formattedIssuesList = issues.map((issue: any) => ({
+        id: issue.id,
+        title: issue.title,
+        description: issue.description,
+        type: issue.type,
+        status: issue.status,
+        reporter: userMap[issue.reporter_id],
+        created_at: issue.created_at,
+        updated_at: issue.updated_at,
+    }))
+
+    return formattedIssuesList;
 }
 
 const getSingleIssueFromDB = async (id: string) => {
-    const requestedIssue = await pool.query(`
-        SELECT 
-            i.id, i.title, i.description, i.type, i.status, i.created_at, i.updated_at,
-            u.id AS user_id, u.name AS user_name, u.role AS user_role
-        FROM issues i
-        LEFT JOIN users u ON i.reporter_id = u.id
-        WHERE i.id = $1
-    `, [id])
-    return requestedIssue;
+    const issueResult = await pool.query(`
+        SELECT * FROM issues WHERE id = $1
+        `, [id])
+
+    if (issueResult.rows.length === 0) {
+        return null;
+    }
+    const issue = issueResult.rows[0];
+
+    const userResult = await pool.query(`
+        SELECT id, name, role FROM users WHERE id = $1
+    `, [issue.reporter_id])
+
+    const reporter = userResult.rows[0];
+
+    const formattedIssue = {
+        id: issue.id,
+        title: issue.title,
+        description: issue.description,
+        type: issue.type,
+        status: issue.status,
+        reporter,
+        created_at: issue.created_at,
+        updated_at: issue.updated_at,
+    }
+    return formattedIssue;
 }
 
 const updateIssueInDB = async (payload: IssuesInterface, id: string) => {
