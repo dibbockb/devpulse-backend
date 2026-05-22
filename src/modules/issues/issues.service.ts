@@ -15,10 +15,36 @@ const createIssueIntoDB = async (payload: IssuesInterface) => {
     return createdIssueData;
 }
 
-const getIssuesFromDB = async () => {
+const getIssuesFromDB = async (query: {
+    sort?: string,
+    type?: string,
+    status?: string
+}) => {
+    const { sort, type, status } = query;
+    const conditions: string[] = [];
+    const values: string[] = [];
+
+    if (type) {
+        values.push(type);
+        conditions.push(`type = $${values.length}`)
+    }
+
+    if (status) {
+        values.push(status);
+        conditions.push(`status = $${values.length}`)
+    }
+
+    const whereClause = conditions.length > 0
+        ? `WHERE ${conditions.join(' AND ')}`
+        : '';
+
+    const orderBy = sort === 'oldest'
+        ? `ORDER BY created_at ASC`
+        : `ORDER BY created_at DESC`;
+
     const issuesResult = await pool.query(`
-    SELECT * FROM issues ORDER BY created_at DESC
-    `)
+        SELECT * FROM issues ${whereClause} ${orderBy}
+    `, values)
 
     const issues = issuesResult.rows;
     if (issues.length === 0) { return [] };

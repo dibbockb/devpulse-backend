@@ -29,7 +29,13 @@ const createIssue = async (req: Request, res: Response) => {
 
 const getIssues = async (req: Request, res: Response) => {
     try {
-        const issues = await issueService.getIssuesFromDB();
+        const { sort, type, status } = req.query;
+        
+        const issues = await issueService.getIssuesFromDB({
+            sort: sort as string,
+            type: type as string,
+            status: status as string,
+        });
         res.status(200).json({
             success: true,
             data: issues
