@@ -13,13 +13,13 @@ const loginUserIntoDB = async (payload: { email: string, password: string }) => 
 
 
     if (userData.rows.length === 0) {
-        throw new Error(`🔴 Invalid Credentials.`)
+        throw new Error(`Invalid Credentials.`)
     }
 
     const user = userData.rows[0];
     const matchPwd = await bcrypt.compare(password, user.password)
     if (!matchPwd) {
-        throw new Error(`🔴 Wrong Password.`)
+        throw new Error(`Wrong Password.`)
     }
 
     delete user.password;

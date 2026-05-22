@@ -6,6 +6,7 @@ dotenv.config({
 })
 
 const envConfig = {
+    cors_origin: process.env.CORS_ORIGIN,
     port: process.env.PORT,
     db_key: process.env.DB_KEY,
     jwt_secret: process.env.JWT_SECRET,

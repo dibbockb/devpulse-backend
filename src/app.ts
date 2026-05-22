@@ -5,14 +5,13 @@ import globalErrorHandler from "./utility/globalErrorHandler";
 import { userRoute } from "./modules/user/user.route";
 import { authRoute } from "./modules/auth/auth.route";
 import { issuesRoute } from "./modules/issues/issues.route";
+import envConfig from "./config/config";
 
 const app: Application = express();
 
-app.use(cors({ origin: `http://localhost:5000` })) ///???move this to ENVIRONMENT
+app.use(cors({ origin: envConfig.cors_origin }))
 app.use(express.json())
-app.use(express.text()) //???
 app.use(CookieParsar())
-app.use(express.urlencoded({ extended: true })) //???
 
 app.get('/', (req: Request, res: Response) => {
     res.status(200).json({

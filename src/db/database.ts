@@ -31,11 +31,11 @@ export const connectDB = async () => {
             updated_at TIMESTAMP DEFAULT NOW()
             )
             `)
-        console.log(`🟢 Connected to Database...`);
+        console.log(`Connected to Database...`);
 
 
     } catch (error) {
-        console.log(`🔴 Failed to connect to Database...`);
+        console.log(`Failed to connect to Database...`);
         console.log(error);
     }
 }

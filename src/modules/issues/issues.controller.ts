@@ -54,7 +54,7 @@ const getIssues = async (req: Request, res: Response) => {
         sendResponse(res, {
             success: false,
             statusCode: 500,
-            message: "Unable to retrive issues.",
+            message: "Unable to retrieve issues.",
         })
     }
 

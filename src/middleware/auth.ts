@@ -45,7 +45,6 @@ const checkRole = (...roles: string[]) => {
             }
 
             if (user.role && roles.includes(user.role)) {
-                console.log(`Permission granted`);
                 return next();
             }
             return sendResponse(res, { statusCode: 401, success: false, message: `You do not have permission` })

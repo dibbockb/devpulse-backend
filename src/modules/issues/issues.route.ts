@@ -10,4 +10,5 @@ router.patch(`/:id`, auth.verifyToken(), auth.checkUpdatePermission(), issuesCon
 router.post(`/`, auth.verifyToken(), auth.checkRole("contributor", "maintainer"), issuesController.createIssue)
 router.delete(`/:id`, auth.verifyToken(), auth.checkRole("maintainer"), issuesController.deleteIssue)
 
+
 export const issuesRoute: Router = router;
