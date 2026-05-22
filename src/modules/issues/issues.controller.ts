@@ -23,13 +23,21 @@ const createIssue = async (req: Request, res: Response) => {
 }
 
 const getIssues = async (req: Request, res: Response) => {
-    const issuesList = await issueService.getIssuesFromDB();
-    sendResponse(res, {
-        success: true,
-        statusCode: 200,
-        message: "Retrieved All Issues.",
-        data: issuesList.rows,
-    })
+    try {
+        const issuesList = await issueService.getIssuesFromDB();
+        sendResponse(res, {
+            success: true,
+            statusCode: 200,
+            message: "Retrieved All Issues.",
+            data: issuesList.rows,
+        })
+    } catch (error) {
+        sendResponse(res, {
+            success: false,
+            statusCode: 500,
+            message: "Unable to retrive issues.",
+        })
+    }
 
 }
 
@@ -77,7 +85,7 @@ const updateIssue = async (req: Request, res: Response,) => {
             statusCode: 500,
             success: false,
             message: "Unable to Update Issue",
-            errors: (error as Error).message
+            error: (error as Error).message
         })
     }
 }
@@ -104,7 +112,7 @@ const deleteIssue = async (req: Request, res: Response) => {
             statusCode: 500,
             success: false,
             message: "Unable to Delete Issue",
-            errors: (error as Error).message
+            error: (error as Error).message
         })
     }
 }

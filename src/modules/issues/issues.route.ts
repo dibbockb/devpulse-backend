@@ -4,10 +4,10 @@ import { auth } from "../../middleware/auth";
 
 const router = Router()
 
-router.post(`/`, auth.checkToken(), auth.verifyUser(), auth.checkRole("contributor", "maintainer"), issuesController.createIssue)
 router.get(`/`, issuesController.getIssues)
 router.get(`/:id`, issuesController.getSingleIssue)
 router.patch(`/:id`, issuesController.updateIssue)
-router.delete(`/:id`, issuesController.deleteIssue)
+router.post(`/`, auth.verifyToken(), auth.checkRole("contributor", "maintainer"), issuesController.createIssue)
+router.delete(`/:id`, auth.verifyToken(), auth.checkRole("maintainer"), issuesController.deleteIssue)
 
 export const issuesRoute: Router = router;

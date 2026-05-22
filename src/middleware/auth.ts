@@ -4,25 +4,7 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 import envConfig from "../config/config";
 import { pool } from "../db/database";
 
-const checkToken = () => {
-    return async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const token = req.headers.authorization;
-            if (!token) {
-                return sendResponse(res, {
-                    success: false,
-                    statusCode: 403,
-                    message: `Unauthorized!`
-                })
-            }
-            return next();
-        } catch (error) {
-            return next(error)
-        }
-    }
-}
-
-const verifyUser = () => {
+const verifyToken = () => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
             const token = req.headers.authorization as string;
@@ -73,4 +55,4 @@ const checkRole = (...roles: string[]) => {
     }
 }
 
-export const auth = { checkToken, verifyUser, checkRole };
+export const auth = { verifyToken, checkRole };

@@ -18,7 +18,7 @@ const createUser = async (req: Request, res: Response) => {
             statusCode: 500,
             success: false,
             message: (error as Error).message,
-            errors: error as string
+            error: error as string
         })
     }
 }
