@@ -38,13 +38,9 @@ const verifyUser = () => {
             }
             delete user.password;
 
-            if (userData.rows.length === 0) {
-                return sendResponse(res, {
-                    success: false,
-                    statusCode: 403,
-                    message: `Forbidden!`
-                })
-            }
+            req.user = user;
+            req.tokenPayload = decodedToken;
+
             return next();
         } catch (error) {
             return next(error)
@@ -55,22 +51,17 @@ const verifyUser = () => {
 const checkRole = (...roles: string[]) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const token = req.headers.authorization as string;
-            const decodedToken = jwt.verify(token, envConfig.jwt_secret as string,) as JwtPayload;
-            const userData = await pool.query(`
+            const user = req.user;
+            const decodedToken = req.tokenPayload;
 
-            SELECT * FROM users WHERE email=$1
-            `, [decodedToken.email])
-            const user = userData.rows[0]
-
-            if (!user) {
+            if (!user || !decodedToken) {
                 return sendResponse(res, { statusCode: 404, success: false, message: "User not found" });
             }
-            delete user.password;
 
             if (decodedToken.role !== user.role) {
                 return sendResponse(res, { statusCode: 403, success: false, message: "Token dont match" });
             }
+
             if (user.role && roles.includes(user.role)) {
                 console.log(`Permission granted`);
                 return next();

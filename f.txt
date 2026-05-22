@@ -1,6 +1,0 @@
-    sendResponse(res, {
-            statusCode: 500,
-            success: false,
-            message: (error as Error).message,
-            errors: error as string
-        })
