@@ -4,7 +4,12 @@ import { issueService } from "./issues.service";
 
 const createIssue = async (req: Request, res: Response) => {
     try {
-        const createdIssueData = await issueService.createIssueIntoDB(req.body)
+        const reporterId = req.user?.id;
+        const issuedData = {
+            ...req.body,
+            reporter_id: reporterId
+        }
+        const createdIssueData = await issueService.createIssueIntoDB(issuedData)
 
         sendResponse(res, {
             success: true,
@@ -24,13 +29,27 @@ const createIssue = async (req: Request, res: Response) => {
 
 const getIssues = async (req: Request, res: Response) => {
     try {
-        const issuesList = await issueService.getIssuesFromDB();
-        sendResponse(res, {
+        const result = await issueService.getIssuesFromDB();
+
+        const formattedIssues = result.rows.map((issue: any) => ({
+            id: issue.id,
+            title: issue.title,
+            description: issue.description,
+            type: issue.type,
+            status: issue.status,
+            reporter: {
+                id: issue.user_id,
+                name: issue.user_name,
+                role: issue.user_role
+            },
+            created_at: issue.created_at,
+            updated_at: issue.updated_at
+        }));
+
+        res.status(200).json({
             success: true,
-            statusCode: 200,
-            message: "Retrieved All Issues.",
-            data: issuesList.rows,
-        })
+            data: formattedIssues
+        });
     } catch (error) {
         sendResponse(res, {
             success: false,
@@ -51,13 +70,26 @@ const getSingleIssue = async (req: Request, res: Response) => {
                 message: "Issue not found",
             });
         }
+        const issue = result.rows[0];
+        const formattedSingleIssue = {
+            id: issue.id,
+            title: issue.title,
+            description: issue.description,
+            type: issue.type,
+            status: issue.status,
+            reporter: {
+                id: issue.user_id,
+                name: issue.user_name,
+                role: issue.user_role
+            },
+            created_at: issue.created_at,
+            updated_at: issue.updated_at
+        };
 
-        sendResponse(res, {
+        res.status(200).json({
             success: true,
-            statusCode: 200,
-            message: `Issue retrieved`,
-            data: result.rows[0]
-        })
+            data: formattedSingleIssue
+        });
 
     } catch (error) {
         sendResponse(res, {
