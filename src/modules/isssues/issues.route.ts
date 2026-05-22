@@ -1,10 +1,10 @@
 import { Router } from "express";
 import { issuesController } from "./issues.controller";
-import { authMiddlewares } from "../../middleware/auth";
+import { auth } from "../../middleware/auth";
 
 const router = Router()
 
-router.post(`/`, authMiddlewares.checkToken(), authMiddlewares.verifyUser(), issuesController.createIssue)
+router.post(`/`, auth.checkToken(), auth.verifyUser(), auth.checkRole("contributor", "maintainer"), issuesController.createIssue)
 router.get(`/`, issuesController.getIssues)
 router.get(`/:id`, issuesController.getSingleIssue)
 router.patch(`/:id`, issuesController.updateIssue)
