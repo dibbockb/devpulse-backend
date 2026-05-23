@@ -10,24 +10,17 @@ const verifyToken = () => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
             const token = req.headers.authorization as string;
-            const decodedToken = jwt.verify(token, envConfig.jwt_secret as string,) as JwtPayload;
+            const decodedToken = jwt.verify(token, envConfig.jwt_secret as string) as JwtPayload;
 
-            const userData = await pool.query(`
-            SELECT * FROM users WHERE email=$1
-            `, [decodedToken.email])
-
-            const user = userData.rows[0] as DBUserInterface
-            if (!user) {
-                return sendResponse(res, { statusCode: StatusCodes.NOT_FOUND, success: false, message: "User not found" });
-            }
-            delete user.password;
-
-            req.user = user;
-            req.tokenPayload = decodedToken;
+            req.user = {
+                id: decodedToken.id,
+                email: decodedToken.email,
+                role: decodedToken.role,
+            };
 
             return next();
         } catch (error) {
-            return next(error)
+            return next(error);
         }
     }
 }
