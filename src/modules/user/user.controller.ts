@@ -5,6 +5,15 @@ import { StatusCodes } from "http-status-codes";
 
 const createUser = async (req: Request, res: Response) => {
     try {
+        const { name, email, password, role } = req.body;
+
+        if (!name || !email || !password) {
+            return sendResponse(res, {
+                statusCode: StatusCodes.BAD_REQUEST,
+                success: false,
+                message: "name, email, and password are required"
+            });
+        }
         const result = await userService.createUserInDB(req.body);
 
         sendResponse(res, {

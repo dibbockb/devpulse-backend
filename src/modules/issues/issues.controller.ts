@@ -5,6 +5,23 @@ import { StatusCodes } from "http-status-codes";
 
 const createIssue = async (req: Request, res: Response) => {
     try {
+        const { title, description, type } = req.body;
+        if (!title || !description || !type) {
+            return sendResponse(res, {
+                statusCode: StatusCodes.BAD_REQUEST,
+                success: false,
+                message: "title / description / type is required"
+            });
+        }
+
+        if (!['bug', 'feature_request'].includes(type)) {
+            return sendResponse(res, {
+                statusCode: StatusCodes.BAD_REQUEST,
+                success: false,
+                message: "type must be 'bug' / 'feature_request'"
+            });
+        }
+
         const reporterId = req.user?.id;
         const issuedData = {
             ...req.body,
