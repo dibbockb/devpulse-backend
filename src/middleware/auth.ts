@@ -4,6 +4,7 @@ import jwt, { type JwtPayload } from "jsonwebtoken";
 import envConfig from "../config/config";
 import { pool } from "../db/database";
 import type { DBUserInterface } from "../types/user.type";
+import { StatusCodes } from "http-status-codes";
 
 const verifyToken = () => {
     return async (req: Request, res: Response, next: NextFunction) => {
@@ -17,7 +18,7 @@ const verifyToken = () => {
 
             const user = userData.rows[0] as DBUserInterface
             if (!user) {
-                return sendResponse(res, { statusCode: 404, success: false, message: "User not found" });
+                return sendResponse(res, { statusCode: StatusCodes.NOT_FOUND, success: false, message: "User not found" });
             }
             delete user.password;
 
@@ -38,17 +39,17 @@ const checkRole = (...roles: string[]) => {
             const decodedToken = req.tokenPayload;
 
             if (!user || !decodedToken) {
-                return sendResponse(res, { statusCode: 404, success: false, message: "User not found" });
+                return sendResponse(res, { statusCode: StatusCodes.NOT_FOUND, success: false, message: "User not found" });
             }
 
             if (decodedToken.role !== user.role) {
-                return sendResponse(res, { statusCode: 403, success: false, message: "Token dont match" });
+                return sendResponse(res, { statusCode: StatusCodes.FORBIDDEN, success: false, message: "Token dont match" });
             }
 
             if (user.role && roles.includes(user.role)) {
                 return next();
             }
-            return sendResponse(res, { statusCode: 403, success: false, message: `You do not have permission` })
+            return sendResponse(res, { statusCode: StatusCodes.FORBIDDEN, success: false, message: `You do not have permission` })
         } catch (error) {
             return next(error);
         }
@@ -69,7 +70,7 @@ const checkUpdatePermission = () => {
             const issue = issueResult.rows[0];
 
             if (!issue) {
-                return res.status(404).json({
+                return res.status(StatusCodes.NOT_FOUND).json({
                     success: false,
                     message: "Issue not found"
                 });
@@ -88,7 +89,7 @@ const checkUpdatePermission = () => {
                 }
             }
 
-            return res.status(403).json({
+            return res.status(StatusCodes.FORBIDDEN).json({
                 success: false,
                 message: "You do not have permission."
             });

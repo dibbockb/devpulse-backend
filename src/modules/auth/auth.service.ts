@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import { pool } from "../../db/database";
 import jwt, { type JwtPayload } from "jsonwebtoken"
 import envConfig from "../../config/config";

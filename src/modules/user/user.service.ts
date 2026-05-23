@@ -1,6 +1,6 @@
 import { pool } from "../../db/database";
 import type { UserInterface } from "./user.interface";
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 
 const createUserInDB = async (payload: UserInterface) => {
     const { name, email, password, role } = payload;
