@@ -8,7 +8,6 @@ declare global {
                 email: string;
                 role: string;
             };
-            tokenPayload?: JwtPayload;
         }
     }
 }

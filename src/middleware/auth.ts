@@ -3,7 +3,6 @@ import sendResponse from "../utility/sendResponse";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import envConfig from "../config/config";
 import { pool } from "../db/database";
-import type { DBUserInterface } from "../types/user.type";
 import { StatusCodes } from "http-status-codes";
 
 const verifyToken = () => {
@@ -29,14 +28,9 @@ const checkRole = (...roles: string[]) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
             const user = req.user;
-            const decodedToken = req.tokenPayload;
 
-            if (!user || !decodedToken) {
-                return sendResponse(res, { statusCode: StatusCodes.NOT_FOUND, success: false, message: "User not found" });
-            }
-
-            if (decodedToken.role !== user.role) {
-                return sendResponse(res, { statusCode: StatusCodes.FORBIDDEN, success: false, message: "Token dont match" });
+            if (!user) {
+                return sendResponse(res, { statusCode: StatusCodes.UNAUTHORIZED, success: false, message: "Unauthorized" });
             }
 
             if (user.role && roles.includes(user.role)) {

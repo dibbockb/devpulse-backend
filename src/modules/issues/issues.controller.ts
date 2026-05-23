@@ -54,10 +54,12 @@ const getIssues = async (req: Request, res: Response) => {
             type: type as string,
             status: status as string,
         });
-        res.status(StatusCodes.OK).json({
+        sendResponse(res, {
+            statusCode: StatusCodes.OK,
             success: true,
+            message: "Issues retrieved successfully",
             data: issues
-        });
+        })
 
     } catch (error) {
         sendResponse(res, {
@@ -80,7 +82,12 @@ const getSingleIssue = async (req: Request, res: Response) => {
             });
         }
 
-        res.status(StatusCodes.OK).json({ success: true, data: issue });
+        sendResponse(res, {
+            statusCode: StatusCodes.OK,
+            success: true,
+            message: "Issues retrieved successfully",
+            data: issue
+        })
 
     } catch (error) {
         sendResponse(res, { statusCode: StatusCodes.INTERNAL_SERVER_ERROR, success: false, message: (error as Error).message })
