@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { pool } from "../../db/database";
 import jwt, { type JwtPayload } from "jsonwebtoken"
 import envConfig from "../../config/config";
+import type { DBUserInterface } from "../../types/user.type";
 
 
 const loginUserIntoDB = async (payload: { email: string, password: string }) => {
@@ -16,13 +17,13 @@ const loginUserIntoDB = async (payload: { email: string, password: string }) => 
         throw new Error(`Invalid Credentials.`)
     }
 
-    const user = userData.rows[0];
-    const matchPwd = await bcrypt.compare(password, user.password)
+    const dbuser = userData.rows[0] as DBUserInterface;
+    const matchPwd = await bcrypt.compare(password, dbuser.password as string)
     if (!matchPwd) {
         throw new Error(`Wrong Password.`)
     }
 
-    delete user.password;
+    const { password: _, ...user } = dbuser;
 
     const jwtPayload = {
         id: user.id,

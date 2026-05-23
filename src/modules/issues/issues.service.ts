@@ -1,5 +1,6 @@
 import { pool } from "../../db/database";
-import type { IssuesInterface } from "./issues.type";
+import type ReporterInterface from "../../types/reporter.type";
+import type { IssueRow, IssuesInterface } from "./issues.type";
 
 const createIssueIntoDB = async (payload: IssuesInterface) => {
     const { title, description, type, reporter_id } = payload;
@@ -49,18 +50,18 @@ const getIssuesFromDB = async (query: {
     const issues = issuesResult.rows;
     if (issues.length === 0) { return [] };
 
-    const reporterIds = [...new Set(issues.map((i: any) => i.reporter_id))];
+    const reporterIds = [...new Set(issues.map((i) => i.reporter_id))];
 
     const usersResult = await pool.query(`
         SELECT id, name, role FROM users WHERE id = ANY($1::int[])
     `, [reporterIds])
 
-    const userMap: Record<number, any> = {};
-    usersResult.rows.forEach((u: any) => {
+    const userMap: Record<number, ReporterInterface> = {};
+    usersResult.rows.forEach((u: ReporterInterface) => {
         userMap[u.id] = u;
     });
 
-    const formattedIssuesList = issues.map((issue: any) => ({
+    const formattedIssuesList = issues.map((issue) => ({
         id: issue.id,
         title: issue.title,
         description: issue.description,

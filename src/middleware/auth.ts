@@ -3,6 +3,7 @@ import sendResponse from "../utility/sendResponse";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import envConfig from "../config/config";
 import { pool } from "../db/database";
+import type { DBUserInterface } from "../types/user.type";
 
 const verifyToken = () => {
     return async (req: Request, res: Response, next: NextFunction) => {
@@ -14,7 +15,7 @@ const verifyToken = () => {
             SELECT * FROM users WHERE email=$1
             `, [decodedToken.email])
 
-            const user = userData.rows[0]
+            const user = userData.rows[0] as DBUserInterface
             if (!user) {
                 return sendResponse(res, { statusCode: 404, success: false, message: "User not found" });
             }
